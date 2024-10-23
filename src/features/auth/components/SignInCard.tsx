@@ -8,26 +8,23 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import Link from "next/link";
+import { loginSchema } from "../shemas";
+import { useLogin } from "../api/use-login";
 
-const formSchema = z.object({
-  email: z.string().trim().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .max(30, { message: "Password must be at most 30 characters" }),
-});
 
 export const SignInCard = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const {mutate} = useLogin()
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-      console.log(values)
+  const onSubmit = (values: z.infer<typeof loginSchema>) => {
+      mutate({json: values})
   }
 
   return (
@@ -102,6 +99,16 @@ export const SignInCard = () => {
           <FaGithub className="mr-2 size-5" />
           Login with Github
         </Button>
+      </CardContent>
+      <div className="px-7">
+        <DottedSeparator/>
+      </div>
+      <CardContent className="p-7 flex items-center justify-center">
+        <p>Don&apos;t have an account?
+            <Link href={"/sign-up"}>
+            <span className="text-blue-700" >&nbsp;Sign Up</span>
+            </Link>
+        </p>
       </CardContent>
     </Card>
   );

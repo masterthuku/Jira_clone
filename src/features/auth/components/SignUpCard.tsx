@@ -21,19 +21,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
+import { registerSchema } from "../shemas";
+import { useRegister } from "../api/use-register";
 
-const formSchema = z.object({
-  name: z.string().trim().min(1, { message: "Name is required" }),
-  email: z.string().trim().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .max(30, { message: "Password must be at most 30 characters" }),
-});
+
 
 export const SignUpCard = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { mutate } = useRegister();
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -41,8 +37,8 @@ export const SignUpCard = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const onSubmit = (values: z.infer<typeof registerSchema>) => {
+    mutate({ json: values });
   };
   return (
     <Card className="w-full md:w-[487px] border-none shadow-none">
@@ -142,6 +138,16 @@ export const SignUpCard = () => {
           <FaGithub className="mr-2 size-5" />
           Continue with Github
         </Button>
+      </CardContent>
+      <div className="px-7">
+        <DottedSeparator/>
+      </div>
+      <CardContent className="p-7 flex items-center justify-center">
+        <p>Already have an account?
+            <Link href={"/sign-in"}>
+            <span className="text-blue-700">&nbsp;Log In</span>
+            </Link>
+        </p>
       </CardContent>
     </Card>
   );
