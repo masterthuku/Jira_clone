@@ -1,3 +1,5 @@
+"use client";
+
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +29,7 @@ import { useRegister } from "../api/use-register";
 
 
 export const SignUpCard = () => {
-  const { mutate } = useRegister();
+  const { mutate, isPending } = useRegister();
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -69,6 +71,7 @@ export const SignUpCard = () => {
                   <FormControl>
                     <Input
                       {...field}
+                      disabled={isPending}
                       type="text"
                       placeholder="Enter your name"
                     />
@@ -85,6 +88,7 @@ export const SignUpCard = () => {
                   <FormControl>
                     <Input
                       {...field}
+                      disabled={isPending}
                       type="email"
                       placeholder="Enter your email address"
                     />
@@ -102,6 +106,7 @@ export const SignUpCard = () => {
                   <FormControl>
                     <Input
                       {...field}
+                      disabled={isPending}
                       type="password"
                       placeholder="Enter your password"
                     />
@@ -110,7 +115,7 @@ export const SignUpCard = () => {
                 </FormItem>
               )}
             />
-            <Button className="w-full" disabled={false} size="lg" type="submit">
+            <Button className="w-full " disabled={isPending} size="lg" type="submit">
               Sign Up
             </Button>
           </form>
@@ -124,7 +129,7 @@ export const SignUpCard = () => {
           className="w-full"
           variant={"secondary"}
           size="lg"
-          disabled={false}
+          disabled={isPending}
         >
           <FcGoogle className="mr-2 size-5" />
           Continue with Google
@@ -133,7 +138,7 @@ export const SignUpCard = () => {
           className="w-full"
           variant={"secondary"}
           size="lg"
-          disabled={false}
+          disabled={isPending}
         >
           <FaGithub className="mr-2 size-5" />
           Continue with Github

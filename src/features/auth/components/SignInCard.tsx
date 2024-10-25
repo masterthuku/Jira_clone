@@ -1,3 +1,5 @@
+"use client";
+
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +16,7 @@ import { useLogin } from "../api/use-login";
 
 
 export const SignInCard = () => {
-  const {mutate} = useLogin()
+  const {mutate, isPending} = useLogin()
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -46,6 +48,7 @@ export const SignInCard = () => {
                   <FormControl>
                     <Input
                       {...field}
+                      disabled={isPending}
                       type="email"
                       placeholder="Enter your email address"
                     />
@@ -63,6 +66,7 @@ export const SignInCard = () => {
                   <FormControl>
                     <Input
                       {...field}
+                      disabled={isPending}
                       type="password"
                       placeholder="Enter your password"
                     />
@@ -71,7 +75,7 @@ export const SignInCard = () => {
                 </FormItem>
               )}
             />
-            <Button className="w-full" disabled={false} size="lg" type="submit" >
+            <Button className="w-full " disabled={isPending} size="lg" type="submit" >
               Login
             </Button>
           </form>
@@ -85,7 +89,7 @@ export const SignInCard = () => {
           className="w-full"
           variant={"secondary"}
           size="lg"
-          disabled={false}
+          disabled={isPending}
         >
           <FcGoogle className="mr-2 size-5" />
           Login with Google
@@ -94,7 +98,7 @@ export const SignInCard = () => {
           className="w-full"
           variant={"secondary"}
           size="lg"
-          disabled={false}
+          disabled={isPending}
         >
           <FaGithub className="mr-2 size-5" />
           Login with Github
