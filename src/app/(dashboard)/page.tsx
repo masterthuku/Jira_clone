@@ -9,7 +9,7 @@ export default async function Home() {
   if (!user) redirect("/sign-in")
   return (
     <div>
-      <UserButton />
+      home page
     </div>
   );
 }
