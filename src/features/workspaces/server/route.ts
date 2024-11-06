@@ -119,7 +119,7 @@ const app = new Hono()
           IMAGES_BUCKET_ID,
           file.$id
         );
-         uploadedImageUrl = `data:image/png;base64,${Buffer.from(
+        uploadedImageUrl = `data:image/png;base64,${Buffer.from(
           arrayBuffer
         ).toString("base64")}`;
       } else {
@@ -134,9 +134,51 @@ const app = new Hono()
           name,
           imageUrl: uploadedImageUrl,
         }
-      )
+      );
       return c.json({ data: workspace });
     }
-  );
+  )
+  .delete("/:workspaceId", sessionMiddleware, async (c) => {
+    const databases = c.get("databases");
+    const user = c.get("user");
+
+    const { workspaceId } = c.req.param();
+
+    const member = await getMember({
+      databases,
+      workspaceId,
+      userId: user.$id,
+    });
+    if (!member || member.role !== memberRole.ADMIN) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    //TODO: delete members, projects and tasks
+
+    await databases.deleteDocument(DATABASE_ID, WORKSPACES_ID, workspaceId);
+
+    return c.json({ data: { $id: workspaceId } });
+  })
+  .post("/:workspaceId/reset-invite-code", sessionMiddleware, async (c) => {
+    const databases = c.get("databases");
+    const user = c.get("user");
+
+    const { workspaceId } = c.req.param();
+
+    const member = await getMember({
+      databases,
+      workspaceId,
+      userId: user.$id,
+    });
+    if (!member || member.role !== memberRole.ADMIN) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const workspace = await databases.updateDocument(DATABASE_ID, WORKSPACES_ID, workspaceId, {
+      inviteCode: generateInviteCode(8),
+    });
+
+    return c.json({ data: workspace });
+  });
 
 export default app;

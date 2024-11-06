@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { getCurrent } from "@/features/auth/actions";
-import { getWorkspace } from "@/features/workspaces/actions";
+import { getCurrent } from "@/features/auth/queries";
+import { getWorkspace } from "@/features/workspaces/queries";
 import { EditWorkspaceForm } from "@/features/workspaces/components/edit-workspace";
 import { redirect } from "next/navigation";
 
