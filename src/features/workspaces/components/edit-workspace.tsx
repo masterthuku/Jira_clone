@@ -98,11 +98,6 @@ export const EditWorkspaceForm = ({
     };
     mutate(
       { form: finalValues, param: { workspaceId: initialValues.$id } },
-      {
-        onSuccess: ({ data }) => {
-          form.reset();
-        },
-      }
     );
   };
 
@@ -257,7 +252,7 @@ export const EditWorkspaceForm = ({
       </Card>
 
       <Card className="w-full h-full border-none shadow-none">
-        <CardContent className="p=7">
+        <CardContent className="p-7">
           <div className="flex flex-col">
             <h3 className="font-bold ">Invite Members</h3>
             <p className="text-sm text-muted-foreground">
@@ -291,7 +286,7 @@ export const EditWorkspaceForm = ({
       </Card>
 
       <Card className="w-full h-full border-none shadow-none">
-        <CardContent className="p=7">
+        <CardContent className="p-7">
           <div className="flex flex-col">
             <h3 className="font-bold ">Danger Zone</h3>
             <p className="text-sm text-muted-foreground">

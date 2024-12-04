@@ -176,50 +176,97 @@ const app = new Hono()
       return c.json({ error: "Unauthorized" }, 401);
     }
 
-    const workspace = await databases.updateDocument(DATABASE_ID, WORKSPACES_ID, workspaceId, {
-      inviteCode: generateInviteCode(8),
-    });
+    const workspace = await databases.updateDocument(
+      DATABASE_ID,
+      WORKSPACES_ID,
+      workspaceId,
+      {
+        inviteCode: generateInviteCode(8),
+      }
+    );
 
     return c.json({ data: workspace });
   })
-  .post("/:workspaceId/join", sessionMiddleware, zValidator("json", z.object({code: z.string()})), async (c) => {
-    const { workspaceId } = c.req.param();
-    const { code } = c.req.valid("json");
+  .post(
+    "/:workspaceId/join",
+    sessionMiddleware,
+    zValidator("json", z.object({ code: z.string() })),
+    async (c) => {
+      const { workspaceId } = c.req.param();
+      const { code } = c.req.valid("json");
 
-    const databases = c.get("databases");
+      const databases = c.get("databases");
+      const user = c.get("user");
+
+      const member = await getMember({
+        databases,
+        workspaceId,
+        userId: user.$id,
+      });
+
+      if (member) {
+        return c.json(
+          { error: "You are already a member of this workspace" },
+          400
+        );
+      }
+
+      const workspace = await databases.getDocument<Workspace>(
+        DATABASE_ID,
+        WORKSPACES_ID,
+        workspaceId
+      );
+
+      if (workspace.inviteCode !== code) {
+        return c.json({ error: "Invalid invite code" }, 400);
+      }
+
+      await databases.createDocument(DATABASE_ID, MEMBERS_ID, ID.unique(), {
+        workspaceId,
+        userId: user.$id,
+        role: memberRole.MEMBER,
+      });
+      return c.json({ data: workspace });
+    }
+  )
+
+  .get("/:workspaceId", sessionMiddleware, async (c) => {
     const user = c.get("user");
+    const databases = c.get("databases");
+    const { workspaceId } = c.req.param();
 
     const member = await getMember({
       databases,
       workspaceId,
       userId: user.$id,
-    })
-
-    if (member) {
-      return c.json({ error: "You are already a member of this workspace" }, 400);
+    });
+    if (!member) {
+      return c.json({ error: "Unauthorized" }, 401);
     }
+    const workspace = await databases.getDocument<Workspace>(
+      DATABASE_ID,
+      WORKSPACES_ID,
+      workspaceId
+    );
+    return c.json({ data: workspace });
+  })
+
+  .get("/:workspaceId/info", sessionMiddleware, async (c) => {
+    const databases = c.get("databases");
+    const { workspaceId } = c.req.param();
 
     const workspace = await databases.getDocument<Workspace>(
       DATABASE_ID,
       WORKSPACES_ID,
       workspaceId
-    )
-
-    if (workspace.inviteCode !== code) {
-      return c.json({ error: "Invalid invite code" }, 400)
-    }
-
-    await databases.createDocument(
-      DATABASE_ID,
-      MEMBERS_ID,
-      ID.unique(),
-      {
-        workspaceId,
-        userId: user.$id,
-        role: memberRole.MEMBER,
-      }
-    )
-    return c.json({ data: workspace })
-  })
+    );
+    return c.json({
+      data: {
+        $id: workspaceId,
+        name: workspace.name,
+        imageUrl: workspace.imageUrl,
+      },
+    });
+  });
 
 export default app;
