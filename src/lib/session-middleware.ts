@@ -34,7 +34,8 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(async (c, n
   const session = getCookie(c, AUTH_COOKIE);
 
   if (!session) {
-    return c.json({ error: "Unauthorized" }, 401);
+    // Redirect to sign-in for unauthorized users
+    return c.redirect("/sign-in", 302);
   }
 
   client.setSession(session);
@@ -43,12 +44,18 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(async (c, n
   const databases = new Databases(client);
   const storage = new Storage(client);
 
-  const user = await account.get();
+  try {
+    const user = await account.get();
 
-  c.set("account", account);
-  c.set("databases", databases);
-  c.set("storage", storage);
-  c.set("user", user);
+    c.set("account", account);
+    c.set("databases", databases);
+    c.set("storage", storage);
+    c.set("user", user);
 
-  await next();
+    await next();
+  } catch (error) {
+    console.error("Error fetching user session:", error);
+    return c.redirect("/sign-in", 302); // Redirect in case of an error
+  }
 });
+
