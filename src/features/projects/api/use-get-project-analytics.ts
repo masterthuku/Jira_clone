@@ -7,7 +7,7 @@ interface useGetProjectAnalyticsProps {
   projectId: string;
 }
 
-export type ProjectAnalyticsResponseType = InferResponseType<typeof client.api.projects[":projectId"]["analytics"]["$get"]> 
+export type ProjectAnalyticsResponseType = InferResponseType<typeof client.api.projects[":projectId"]["analytics"]["$get"], 200> 
 
 export const useGetProjectAnalytics = ({ projectId }: useGetProjectAnalyticsProps) => {
   const query = useQuery({

@@ -25,6 +25,7 @@ import {
 import { z } from "zod";
 import { registerSchema } from "../shemas";
 import { useRegister } from "../api/use-register";
+import { signUpWithGithub, signUpWithGoogle } from "@/lib/oauth";
 
 
 
@@ -130,6 +131,7 @@ export const SignUpCard = () => {
           variant={"secondary"}
           size="lg"
           disabled={isPending}
+          onClick={() => signUpWithGoogle()}
         >
           <FcGoogle className="mr-2 size-5" />
           Continue with Google
@@ -139,6 +141,7 @@ export const SignUpCard = () => {
           variant={"secondary"}
           size="lg"
           disabled={isPending}
+          onClick={()=> signUpWithGithub()}
         >
           <FaGithub className="mr-2 size-5" />
           Continue with Github
